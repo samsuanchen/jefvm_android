@@ -1,0 +1,43 @@
+<html>
+<title>jefvm.v3</title>
+<script src="fs.js"></script>
+<style>
+	textarea{
+		width:100%;
+		height:218px;
+		overflow-y: scroll;
+		font-size: 10px;
+		font-weight: normal;
+	}
+</style>
+<script src="jefvm.v3.js"></script>
+jefSys:jefvm.v3.js of length <span id='lenSys'></span><br>
+<textarea id='jefSys'></textarea><br>
+jefExt:jefvm.v3_ext.js of length <span id='lenExt'></span><br>
+<textarea id='jefExt'></textarea><br>
+jefTst:jefvm.v3_tst.js of length <span id='lenTst'></span><br>
+<textarea id='jefTst'></textarea><br>
+jefLog of length <span id='lenLog'>0</span>
+<br><pre id='jefLog'></pre>
+<script>
+var jefSys=document.getElementById("jefSys");
+var jefTst=document.getElementById("jefTst");
+var jefExt=document.getElementById("jefExt");
+var jefLog=document.getElementById("jefLog");
+var lenSys=document.getElementById("lenSys");
+var lenTst=document.getElementById("lenTst");
+var lenExt=document.getElementById("lenExt");
+var lenLog=document.getElementById("lenLog");
+var t=fs.readFileSync("jefvm.v3.js","utf8");
+jefSys.innerHTML=t; lenSys.innerHTML=t.length;
+var cr=vm.cr=function(msg){ var t=msg;			// get t=msg to print
+	if(t===undefined) t=vm.tob, vm.tob='';		// if no msg, get t=tob and clear tob
+	jefLog.innerHTML+=t+'\r\n'					// print t
+};
+var t=fs.readFileSync("jefvm.v3_ext.js","utf8");
+jefExt.innerHTML=t; lenExt.innerHTML=t.length;
+var t=fs.readFileSync("jefvm.v3_tst.js","utf8");
+jefTst.innerHTML=t; lenTst.innerHTML=t.length;
+</script>
+<script src="jefvm.v3_ext.js"></script>
+</html>
