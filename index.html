@@ -2,23 +2,14 @@
 <title>jefvm.v3</title>
 <script src="fs.js"></script>
 <style>
-	inp{
-		color:blue;
-	}
-	err{
-		color:red;
-	}
-	ok{
-		color:green;
-	}
-	pre,textarea{
-		width:100%;
-		font-size: 8px;
-		font-weight: normal;
-	}
-	textarea{
-		height:80px;
-	}
+	inp{ color:blue; }
+	err{ color:red; }
+	tst{ color:brown; }
+	ok{ color:green; }
+	svg{ border:1px solid fuchsia; height:200px; width:99%; }
+	body,button,pre,textarea{ font-size: 8px; font-weight: normal; }
+	pre,textarea{ width:100%; }
+	textarea{ height:80px; }
 </style>
 <script src="jefvm.v3.js"></script>
 jefvm.v3.js loaded of <span id='lenSys'></span> lines<br>
@@ -32,8 +23,26 @@ jefvm.v3_tst.js loaded of <span id='lenTst'></span> lines<br>
   8 for dup 9 i - * 3 .r
   next cr drop
 next</textarea>
+<svg><g id=myGraph>
+    <circle
+      cx=70 cy=75 r=5>
+    </circle>
+    <text
+      transform="rotate(30 5,40)"
+      x=10 y=25>
+    I love SVG
+    </text>
+    <rect 
+      stroke = "red" fill = "none"
+      x=10 y=10 height=130 width=120>
+    </rect>
+  </g>
+  <g transform="translate(100,30),rotate(45 60 60)">
+  <use xlink:href = "#myGraph" />
+  </g>
+  Sorry, your browser does not support inline SVG.</svg>
 <script>
-vm.inp='inp', vm.err='err', vm.ok='ok';
+vm.inp='inp', vm.tst='tst', vm.err='err', vm.ok='ok';
 vm.ids=["lenSys","lenExt","lenTst","jefLog","jefTst"];
 vm.ids.forEach(function(id){vm[id]=document.getElementById(id);})
 var t,n=0;
@@ -43,6 +52,7 @@ vm.cr=function(msg){ var t=vm.tob+(msg||'');// get t=msg to print and clear tob
 	if (t!==" <ok> ok</ok>") vm.lastTob=t;
 	vm.tob='';
 	vm.jefLog.innerHTML+=t+'\n';	// print out
+	vm.jefLog.scrollTop=vm.jefLog.scrollHeight;
 }
 t=fs.readFileSync("jefvm.v3_ext.js","utf8");
 vm.lenExt.innerHTML=t.split('\n').length;

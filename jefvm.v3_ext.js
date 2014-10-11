@@ -1,18 +1,20 @@
 //////////////////////////////////////////////////////////////////////////////////////// tools
-function equal(tag,value,expected){ // asure value is exactly equal to expected
+function equal(tag,value,expected){ var t; // asure value is exactly equal to expected
   tests++;
-  if(value===expected){ passed++; vm.cr(tag+' ok'); }
+  if(value===expected)
+    passed++, t=tag+' ok', vm.cr(vm.tst?'<'+vm.tst+'>'+t+'</'+vm.tst+'>':t);
   else{
     var tv=typeof value, te=typeof expected;
-    vm.cr('??? '+tag+' value:'+value,'not equal to expected:'+expected);
+    t='??? '+tag+' value:'+value+' not equal to expected:'+expected
+    vm.cr(vm.err?'<'+vm.err+'>'+t+'</'+vm.err+'>':t);
     if(tv==='string')
-    vm.cr('val len '+value.length+': '+value.split('').map(function(c){
+      t='val len '+value.length+': '+value.split('').map(function(c){
         return c.charCodeAt(0).toString(16);
-    }).join(' '));
+      }).join(' '), vm.cr(vm.err?'<'+vm.err+'>'+t+'</'+vm.err+'>':t);
     if(te==='string')
-    vm.cr('exp len '+expected.length+': '+expected.split('').map(function(c){
+      t='exp len '+expected.length+': '+expected.split('').map(function(c){
         return c.charCodeAt(0).toString(16);
-    }).join(' '));
+      }).join(' '), vm.cr(vm.err?'<'+vm.err+'>'+t+'</'+vm.err+'>':t);
   }
 }
 function trm(x){ // ignore all space, \t, or \n in string x
