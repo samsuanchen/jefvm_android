@@ -1,4 +1,29 @@
 //////////////////////////////////////////////////////////////////////////////////////// tools
+function equal(tag,value,expected){ // asure value is exactly equal to expected
+  tests++;
+  if(value===expected){ passed++; vm.cr(tag+' ok'); }
+  else{
+    var tv=typeof value, te=typeof expected;
+    vm.cr('??? '+tag+' value:'+value,'not equal to expected:'+expected);
+    if(tv==='string')
+    vm.cr('val len '+value.length+': '+value.split('').map(function(c){
+        return c.charCodeAt(0).toString(16);
+    }).join(' '));
+    if(te==='string')
+    vm.cr('exp len '+expected.length+': '+expected.split('').map(function(c){
+        return c.charCodeAt(0).toString(16);
+    }).join(' '));
+  }
+}
+function trm(x){ // ignore all space, \t, or \n in string x
+    var y='';
+    for(var i=0;i<x.length;i++){
+        var c=x.charAt(i);
+        if(c!==' '&&c!=='\t'&&c!=='\n')y+=c;
+    }
+    return y;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////
 vm.showWords=function(){
 	var nw=vm.words.length;
 	var primitives=[], colons=[];
