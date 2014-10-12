@@ -7,7 +7,7 @@
 	tst{ color:brown; }
 	ok{ color:green; }
 	svg{ border:1px solid fuchsia; height:200px; width:99%; }
-	body,button,pre,textarea{ font-size: 8px; font-weight: normal; }
+	pre,body,textarea,button{ font-size: 10px; font-weight: normal; }
 	pre,textarea{ width:100%; }
 	textarea{ height:80px; }
 </style>
@@ -19,29 +19,32 @@ jefvm.v3_tst.js loaded of <span id='lenTst'></span> lines<br>
 <button type="button" onclick="onClick()">run jeforth</button>
 <button type="button" onclick="prevInp()">&lt;</button>
 <button type="button" onclick="nextInp()">&gt;</button>
-<textarea id='jefTst'>8 for 9 i -
-  8 for dup 9 i - * 3 .r
-  next cr drop
-next</textarea>
-<svg><g id=myGraph>
-    <circle
-      cx=70 cy=75 r=5>
-    </circle>
-    <text
-      transform="rotate(30 5,40)"
-      x=10 y=25>
-    I love SVG
-    </text>
-    <rect 
-      stroke = "red" fill = "none"
-      x=10 y=10 height=130 width=120>
-    </rect>
+<button type="button" onclick="clearJefTst()">clear</button>
+<button type="button" onclick="saveJefTst()">save</button>
+<textarea id='jefTst'>code del function(){
+	vm.svg.removeChild(vm.a);
+} end-code
+code add function(){
+	vm.svg.appendChild(vm.a);
+} end-code
+</textarea>
+<svg>
+  <g id=myGraph>
+    <circle cx=70 cy=75 r=5></circle>
+    <text transform="rotate(30 5,40)" x=10 y=25>I love SVG</text>
+    <rect stroke="red" fill="none" x=10 y=10 height=130 width=120></rect>
   </g>
   <g transform="translate(100,30),rotate(45 60 60)">
-  <use xlink:href = "#myGraph" />
-  </g>
-  Sorry, your browser does not support inline SVG.</svg>
+	<use xlink:href="#myGraph" />
+  </g>Sorry, your browser does not support inline SVG.
+</svg>
 <script>
+vm.svg=document.getElementsByTagName('svg')[0];
+vm.g=vm.svg.children[0]; // 1st graph obj
+vm.a=vm.svg.children[1]; // 2nd graph obj
+vm.c=vm.  g.children[0]; // circle in g
+vm.t=vm.  g.children[1]; // text   in g
+vm.r=vm.  g.children[2]; // rect   in g
 vm.inp='inp', vm.tst='tst', vm.err='err', vm.ok='ok';
 vm.ids=["lenSys","lenExt","lenTst","jefLog","jefTst"];
 vm.ids.forEach(function(id){vm[id]=document.getElementById(id);})
@@ -56,20 +59,37 @@ vm.cr=function(msg){ var t=vm.tob+(msg||'');// get t=msg to print and clear tob
 }
 t=fs.readFileSync("jefvm.v3_ext.js","utf8");
 vm.lenExt.innerHTML=t.split('\n').length;
-t=fs.readFileSync("jefvm.v3_tst.js","utf8");
-vm.lenTst.innerHTML=t.split('\n').length;
+vm.v3_tst=fs.readFileSync("jefvm.v3_tst.js","utf8");
+var lines=vm.v3_tst.split('\n');
+vm.lenTst.innerHTML=lines.length;
 function onClick(){
 	vm.exec(vm.jefTst.value);
 }
 function prevInp(){
 	if(vm.iCmd>0)
-	vm.jefTst.value=vm.cmds[--vm.iCmd];
+		vm.jefTst.value=vm.cmds[--vm.iCmd];
 }
 function nextInp(){
 	if(vm.iCmd<vm.cmds.length-1)
-	vm.jefTst.value=vm.cmds[++vm.iCmd];
+		vm.jefTst.value=vm.cmds[++vm.iCmd];
+}
+function clearJefTst(){
+	vm.jefTst.value='';
 }
 </script>
 <script src="jefvm.v3_ext.js"></script>
 <script src="jefvm.v3_tst.js"></script>
+<script>
+onClick();
+vm.jefTst.value='2 for del 1000 ms add 1000 ms next';
+vm.fence=vm.cmds.length;
+function saveJefTst(){
+	var i=vm.v3_tst.lastIndexOf("vm.showTst('total tests '+tests+' passed '+passed);");
+	var r=vm.v3_tst.substr(i);
+	vm.v3_tst=vm.v3_tst.substr(0,i)+vm.cmds.slice(vm.fence).map(function(t){
+		return 'vm.exec('+JSON.stringify(t)+');'
+	}).join('\n')+'\n'+r;
+	fs.writeFileSync("jefvm.v3_tst.js",vm.v3_tst,"utf8");
+}
+</script>
 </html>

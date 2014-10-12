@@ -2,19 +2,19 @@
 function equal(tag,value,expected){ var t; // asure value is exactly equal to expected
   tests++;
   if(value===expected)
-    passed++, t=tag+' ok', vm.cr(vm.tst?'<'+vm.tst+'>'+t+'</'+vm.tst+'>':t);
+    passed++, vm.showTst(tag+' ok');
   else{
     var tv=typeof value, te=typeof expected;
     t='??? '+tag+' value:'+value+' not equal to expected:'+expected
-    vm.cr(vm.err?'<'+vm.err+'>'+t+'</'+vm.err+'>':t);
+    vm.showErr(t);
     if(tv==='string')
       t='val len '+value.length+': '+value.split('').map(function(c){
         return c.charCodeAt(0).toString(16);
-      }).join(' '), vm.cr(vm.err?'<'+vm.err+'>'+t+'</'+vm.err+'>':t);
+      }).join(' '), vm.showErr(t);
     if(te==='string')
       t='exp len '+expected.length+': '+expected.split('').map(function(c){
         return c.charCodeAt(0).toString(16);
-      }).join(' '), vm.cr(vm.err?'<'+vm.err+'>'+t+'</'+vm.err+'>':t);
+      }).join(' '), vm.showErr(t);
   }
 }
 function trm(x){ // ignore all space, \t, or \n in string x

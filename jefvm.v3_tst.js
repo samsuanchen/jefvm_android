@@ -88,8 +88,8 @@ equal('test 24',vm.lastTob,'3 1 ');
 vm.exec('3 begin dup . 1 - ?dup 0= until cr');
 equal('test 25',vm.lastTob,'3 2 1 ');
 //////////////////////////////////////////////////////////////////////////////////////// v2
-vm.exec('8 for 9 i - 8 for dup 9 i - * 3 .r next cr drop next');
+vm.exec('8 for 9 i - 8\n  for dup 9 i - * 3 .r \n  next cr drop\nnext');
 equal('test 26',vm.lastTob,'  9 18 27 36 45 54 63 72 81');
 //////////////////////////////////////////////////////////////////////////////////////// v2
-vm.cr('total tests '+tests+' passed '+passed);
+vm.showTst('total tests '+tests+' passed '+passed);
 ///////////////////////////////////////////////////////////////////////////////////////////
