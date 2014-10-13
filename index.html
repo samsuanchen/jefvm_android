@@ -2,11 +2,11 @@
 <title>jefvm.v3</title>
 <script src="fs.js"></script>
 <style>
-	inp{ color:blue; }
-	err{ color:red; }
+	inp{ color:blue ; }
+	err{ color:red  ; }
 	tst{ color:brown; }
-	ok{ color:green; }
-	svg{ border:1px solid fuchsia; height:200px; width:99%; }
+	ok { color:green; }
+	svg{ border:1px solid fuchsia; height:200px; width:300px; }
 	pre,body,textarea,button{ font-size: 10px; font-weight: normal; }
 	pre,textarea{ width:100%; }
 	textarea{ height:80px; }
@@ -30,21 +30,22 @@ code add function(){
 </textarea>
 <svg>
   <g id=myGraph>
-    <circle cx=70 cy=75 r=5></circle>
+    <circle cx=70 cy=70 r=5></circle>
     <text transform="rotate(30 5,40)" x=10 y=25>I love SVG</text>
     <rect stroke="red" fill="none" x=10 y=10 height=130 width=120></rect>
   </g>
   <g transform="translate(100,30),rotate(45 60 60)">
 	<use xlink:href="#myGraph" />
-  </g>Sorry, your browser does not support inline SVG.
+  </g>
 </svg>
 <script>
-vm.svg=document.getElementsByTagName('svg')[0];
-vm.g=vm.svg.children[0]; // 1st graph obj
-vm.a=vm.svg.children[1]; // 2nd graph obj
-vm.c=vm.  g.children[0]; // circle in g
-vm.t=vm.  g.children[1]; // text   in g
-vm.r=vm.  g.children[2]; // rect   in g
+var svg=vm.svg=document.getElementsByTagName('svg')[0]; // the svg area
+var g=vm.g=svg.children, g0=g[0], g1=g[1]; // 1st g, 2nd g
+var gc=vm.gc=g0.children, c=vm.c=gc[0], t=vm.t=gc[1], r=vm.r=gc[2]; // circle, text, rect
+var ms=0,time=setInterval(function(){var t;
+	ms=(ms+1)%360,t='translate(100,30),rotate('+ms+' 60 60)';
+	g1.setAttribute('transform',t);
+},10)
 vm.inp='inp', vm.tst='tst', vm.err='err', vm.ok='ok';
 vm.ids=["lenSys","lenExt","lenTst","jefLog","jefTst"];
 vm.ids.forEach(function(id){vm[id]=document.getElementById(id);})

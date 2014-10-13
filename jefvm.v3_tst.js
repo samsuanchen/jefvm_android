@@ -93,3 +93,36 @@ equal('test 26',vm.lastTob,'  9 18 27 36 45 54 63 72 81');
 //////////////////////////////////////////////////////////////////////////////////////// v2
 vm.showTst('total tests '+tests+' passed '+passed);
 ///////////////////////////////////////////////////////////////////////////////////////////
+vm.X=150, vm.Y=100, vm.R=80, vm.PC='black', vm.BC='red', vm.PW=2, vm.PC='black';
+vm.addWord('circle',function(){
+	var o=document.createElement('circle');
+	o.setAttribute('cx',vm.X), o.setAttribute('cy',vm.Y), o.setAttribute('r',vm.R);
+	o.setAttribute('stroke',vm.PC), o.setAttribute('fill',vm.BC);
+	o.setAttribute('stroke-width',vm.PW);
+	vm.o=document.createElement('g');
+	vm.o.appendChild(o);
+	vm.svg.appendChild(vm.o);
+});
+vm.H=80, vm.W=80;
+vm.addWord('rect',function(){
+	var o=document.createElement('rect'), s={};
+	s.fill=vm.BC, s.stroke=vm.PC, s['stroke-width']=vm.PW;
+	o.setAttribute('x',vm.X), o.setAttribute('y',vm.Y);
+	o.setAttribute('width',vm.W), o.setAttribute('height',vm.H);
+	o.setAttribute('style',Object.keys(s).map(function(a){
+		return a+':'+s[a];
+	}).join(';'));
+	vm.o=document.createElement('g');
+	vm.o.appendChild(o);
+	vm.svg.appendChild(vm.o);
+});
+vm.RX=0, vm.RY=0, vm.RA=0;
+vm.addWord('text',function(){
+	var o=document.createElement('text');
+	o.setAttribute('x',vm.X), o.setAttribute('y',vm.Y);
+	o.setAttribute('fill',vm.BC);
+	o.setAttribute('transform','rotate('+vm.RA+' '+vm.RX+','+vm.RY+')');
+	vm.o=document.createElement('g');
+	vm.o.appendChild(o);
+	vm.svg.appendChild(vm.o);
+});
