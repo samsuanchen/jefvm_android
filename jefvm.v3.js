@@ -39,7 +39,7 @@ function JeForthVM() {
 	};
 	var type=vm.type=function(msg){	// send msg to terminal output buffer
 		var t=msg||dStack.pop();					// pop from data stack if no msg
-		if(typeof t==='number' && n%1===0 && vm.base!==10) t=t.toString(vm.base);		//	v1
+		if(typeof t==='number' && t%1===0 && vm.base!==10) t=t.toString(vm.base);		//	v1
 		vm.tob+=t;									// append t to terminal output buffer
     };
     function showErr(msg){var m=msg;
@@ -60,13 +60,15 @@ function JeForthVM() {
         return vm.nTib<vm.tib.length ? vm.tib.charAt(vm.nTib++) : '';	// get null if eoi
     }
     function nextToken(){	// get a token from tib
-		var  token='', c=nextChar();
+		vm.token='', c=nextChar();
         while (c===' '||c==='\t'||c==='\r') c=nextChar();	// skip white-space
         while (c){
 			if(c===' '||c==='\t'||c==='\r'||c==='\n')break;	// break if white-space
-			token+=c, c=nextChar();							// pick up none-white-space
+			vm.token+=c, c=nextChar();							// pick up none-white-space
 		}
-        return token;
+	//	if(c==='\n')vm.nTib--;
+		vm.c=c;
+        return vm.token;
     }
     function compile(v) {	// compile v to code area									//	v2
 		var c= v===undefined ? vm.cArea[vm.ip++] : v;									//	v2
@@ -82,10 +84,10 @@ function JeForthVM() {
     function resumeCall() {	// resume inner loop interpreting of compiled code			//	v3
 		while(vm.ip && !vm.waiting){													//	v3
 			w=vm.cArea[vm.ip];															//	v3
-		//	vm.cr(vm.ip+': '+w.name,vm.dStack);											//	v3
+		//	vm.cr(vm.ip+': '+w.name+' '+vm.dStack);										//	v3
 			vm.ip++, execute(w);														//	v3
 		}																				//	v3
-		if(vm.ip) vm.cr('wait at ',vm.ip);												//	v3
+	//	if(vm.ip) vm.cr('wait at '+vm.ip);												//	v3
     }																					//	v3
     function call(addr) {	// interpret compiled code at addr of cArea					//	v2
 	//	vm.cr(vm.ip+' --> rStack '+vm.rStack.length+': '+vm.rStack.join());				//	v2
@@ -122,6 +124,9 @@ function JeForthVM() {
     }
     function data(tkn){																	//	v1
 		var c=tkn.charAt(0), n, t;														//	v1
+		if(typeof vm[tkn]!=='undefined'){
+			return vm[tkn];
+		}
 		if(c==='"'){																	//	v1
 			t=vm.tib.substr(0,vm.nTib-1);												//	v1
 			var L=Math.max(t.lastIndexOf(' '),t.lastIndexOf('\t'))+1;	// current "	//	v1
@@ -156,18 +161,18 @@ function JeForthVM() {
 	function resumeExec(){		// resume outer source code interpreting loop			//	v3
         vm.waiting=0;                                                                   //  v3
         if(vm.ip){																		//	v3
-            vm.cr('resumeCall at ',vm.ip);
+        //  vm.cr('resumeCall at ',vm.ip);
             resumeCall();		// resume inner compiled code interpreting				//	v3
         }																				//	v3
     //  vm.cr('resume times',++vm.rTimes);	// for tracing only                 		//	v3
-        do{	var token=nextToken();			// get a token
-			if (token) {				// break if no more
-				var w=nameWord[token];			// get word if token is already defined
+        do{	vm.token=nextToken();			// get a token
+			if (vm.token) {				// break if no more
+				var w=nameWord[vm.token];			// get word if token is already defined
 				if (w) execute(w);				// execute or compile the word
 				else {
-					var n=data(token);													//	v1
+					var n=data(vm.token);												//	v1
 					if(n===undefined){													//	v1
-						panic("? "+token+" undefined"); break; // token undefined
+						panic("? "+vm.token+" undefined"); break; // token undefined
 					}																	//	v1
 					if(vm.compiling){													//	v2
 					//	vm.cr('compile doLit '+n);
@@ -177,21 +182,22 @@ function JeForthVM() {
 				}
 			}
 		//	vm.cr('dStack ===> '+dStack.length+':\t['+dStack.join()+']');				//	v1
-        } while(!vm.waiting && !error && vm.nTib<vm.tib.length);						//	v3
+        } while(!vm.waiting && !error && vm.nTib<vm.tib.length);
+		if(!vm.waiting && !error && !vm.compiling){
+			var ok=' ok';
+			if(vm.ok) ok=' <'+vm.ok+'>'+ok+'</'+vm.ok+'>';								//	v3
+			vm.cr(ok);
+		}
     }
     var lastCmd='';
     function exec(cmd){		// source code interpreting
     	if(cmd!==lastCmd)
-			vm.cmds.push(cmd);									// for tracing only
-		vm.iCmd=vm.cmds.length;
+			lastCmd=cmd, vm.cmds.push(cmd), vm.iCmd=vm.cmds.length;	// for tracing only
 		if(vm.inp)vm.showInp(cmd);
-		else vm.cr('source input '+vm.cmds.length+':\t'+cmd);	// for tracing only
+		else vm.cr('source input '+vm.cmds.length+':\t'+cmd);		// for tracing only
 		error=0, vm.tib=cmd, vm.nTib=0;
-		resumeExec();
-		var ok=' ok';
-		if(vm.ok) ok=' <'+vm.ok+'>'+ok+'</'+vm.ok+'>';
-		if(!vm.compiling)vm.cr(ok);														//	v3
-        return error || "ok";				// return error or ok
+		resumeExec();																	//	v3
+        return error || "";				// return error
 	}
 	function addWord(name,xt,immediate){	// 
 		var id=words.length, w={name:name,xt:xt,id:id}; words.push(w), nameWord[name]=w;
@@ -204,7 +210,7 @@ function JeForthVM() {
 		vm.newName=nextToken();
 		t=vm.tib.substr(vm.nTib),i=t.indexOf(endCode),vm.nTib+=i+endCode.length;
 		if(i<0){
-			panic("missing end-code for low level "+token+" definition");
+			panic("missing end-code for low level "+vm.token+" definition");
 			return;
 		}
 		var txt='('+t.substr(0,i)+')';

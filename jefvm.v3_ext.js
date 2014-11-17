@@ -59,7 +59,7 @@ vm.seeColon=function seeColon(addr){
     var s=ip, w=vm.cArea[ip++];
     s+=': ', n=typeof w==='object'?w.name:'';
     if(n){ var x=w.xt, t=typeof x;
-      s+=n+(t==='function'?' primitive':t==='number'?(' colon at '+x):'');
+      s+=n.replace(/</g,'&lt;')+(t==='function'?' primitive':t==='number'?(' colon at '+x):'');
     } else {
       if((prevName==='branch' || prevName==='zBranch')){
         if(w>0)
@@ -77,7 +77,7 @@ vm.seeWord=function seeWord(w){
 	if(typeof o==='object'){
       var n=o.name, x=o.xt, t=typeof x, i=o.immediate?'immediate':'';
 		if(t==='function'){
-			vm.cr(n+' primitive '+i),vm.cr(x);
+			vm.cr(n+' primitive '+i),vm.cr(x.toString().replace(/</g,'&lt;'));
 		} else if(t==='number' && x%1===0){
 			vm.cr(n+' colon '+i),vm.seeColon(x);
 		}else{
@@ -94,15 +94,16 @@ vm.seeArray=function seeArray(arr){
 	vm.cArea=old;
 };
 vm.see=function see(x){
-	var t=typeof x;
-	if(t==='number' && x%1===0){
-		vm.seeColon(x);
+	var o=x||vm.nextToken();
+	var t=typeof o;
+	if(t==='number' && o%1===0){
+		vm.seeColon(o);
 	} else if(t==='object'){
-		vm.seeWord(x);
+		vm.seeWord(o);
 	} else if(t==='string'){
-		vm.seeWord(vm.nameWord[x]);
+		vm.seeWord(vm.nameWord[o]);
 	} else {
-		vm.cr(x+' ?????');
+		vm.cr(o+' ?????');
 	}
 };
 //////////////////////////////////////////////////////////////////////////////////////// tools
@@ -320,5 +321,16 @@ vm.addWord('repeat',function () {
 //////////////////////////////////////////////////////////////////////////////////////////// v3
 vm.addWord('ms',function (n) {
   var m= n===undefined ? vm.dStack.pop() : n;
-  vm.waiting=1,vm.timestamp=setTimeout(vm.resumeExec,m);
-},'immediate');
+  vm.waiting=1, setTimeout(vm.resumeExec,m);
+});
+vm.addWord('append',function(){var d,t,o,a,v;
+  d=vm.dStack.pop(), t=vm.nextToken(), vm[t]=o=d.append(t), a=vm.nextToken();
+  while(a){
+	t=vm.nextToken();
+    if(a==='text')o.text(' '+t);
+    else o.attr(a,t);
+	if(vm.c==='\n')break;
+	a=vm.nextToken();
+  }
+});
+

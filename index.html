@@ -1,17 +1,25 @@
-<html>
-<title>jefvm.v3</title>
-<script src="fs.js"></script>
+<!-- ksanagap\jeforth_ios2\index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>jefvm.v3 application</title>
+<!-- file system used to read/write files -->
+<script src="fs.js"></script> 
+<!-- d3 system used to draw graphics -->
+<script src="d3/d3.js"></script> 
+<!-- css styles of dom objects on index.html -->
 <style>
-	inp{ color:blue ; }
-	err{ color:red  ; }
-	tst{ color:brown; }
-	ok { color:green; }
-	svg{ border:1px solid fuchsia; height:200px; width:300px; }
-	pre,body,textarea,button{ font-size: 10px; font-weight: normal; }
-	pre,textarea{ width:100%; }
-	textarea{ height:80px; }
+	body	{ font-size:10px; font-weight:normal; }
+	span	{ color:blue	; }
+	pre	{ font-size:10px; font-weight:normal; border:1px solid fuchsia; width:100%; }
+	inp	{ color:blue	; } 
+	err	{ color:red	; }
+	tst	{ color:brown; }
+	ok	{ color:green; }
+	button{ font-size:10px; font-weight:normal; }
+	textarea{ font-size:10px; font-weight:normal; border:1px solid fuchsia; height:	80px; width:100%; }
+	svg	{ border:2px solid fuchsia; height:200px; width:300px; }
 </style>
+<!-- require jefvm.v3 -->
 <script src="jefvm.v3.js"></script>
+</head><body>
 jefvm.v3.js loaded of <span id='lenSys'></span> lines<br>
 jefvm.v3_ext.js loaded of <span id='lenExt'></span> lines<br>
 jefvm.v3_tst.js loaded of <span id='lenTst'></span> lines<br>
@@ -20,51 +28,123 @@ jefvm.v3_tst.js loaded of <span id='lenTst'></span> lines<br>
 <button type="button" onclick="prevInp()">&lt;</button>
 <button type="button" onclick="nextInp()">&gt;</button>
 <button type="button" onclick="clearJefTst()">clear</button>
-<button type="button" onclick="saveJefTst()">save</button>
-<textarea id='jefTst'>code del function(){
-	vm.svg.removeChild(vm.a);
+<button type="button" onclick="saveJefTst()">save</button><br><br>
+<textarea id='jefTst'>
+svg append circle r 42   cx 150 cy 100 fill rgba(255,255,0,.1) stroke black stroke-width .5
+svg append circle r 54   cx 150 cy 100 fill rgba(255,255,0,.1) stroke black stroke-width .5
+svg append circle r 72.2 cx 150 cy 100 fill rgba(255,255,0,.1) stroke black stroke-width .5
+svg append circle r 112  cx 150 cy 100 fill rgba(255,255,0,.1) stroke black stroke-width .5
+svg append circle r 123  cx 150 cy 100 fill rgba(255,255,0,.1) stroke black stroke-width .5
+svg	append g	id myGraph1
+g	append circle	r 5 cx 70 cy 70
+g	append line	x1 70 y1 70 x2 130 y2 130 style stroke:red;stroke-width:.5
+g	append line	x1 70 y1 70 x2 10 y2 130 style stroke:red;stroke-width:.5
+g	append text	transform rotate(19,5,40) x 10 y 25
+text	append tspan	fill blue  text  我
+text	append tspan	fill green text  愛
+text	append tspan	fill brown text  偕伊
+text	append tspan	fill red   text  符式
+text	append tspan	fill blue  text  I	 x 52 y 1
+text	append tspan	fill green text  love	 x 62 y 1
+text	append tspan	fill brown text  je	 x 85 y 1
+text	append tspan	fill red   text  forth x 97 y 1
+g	append rect	stroke red fill rgba(255,100,100,.1) x 10 y 10 height 120 width 120
+svg	append g	id myTest1	transform translate(40,40),rotate(0,110,60)
+g	append use	xlink:href #myGraph1
+code to function(){
+	eval('vm["'+vm.nextToken()+'"]='+vm.dStack.pop());
 } end-code
-code add function(){
-	vm.svg.appendChild(vm.a);
+code doJs function(str){ // dojs eval inline str (but also given str)
+	var s= str===undefined ? vm.cArea[vm.ip++] : str;
+	vm.dStack.push(eval(s));
 } end-code
-</textarea>
+code js function(){
+	var t=vm.nextToken();
+	if(vm.compiling)vm.compileCode('doJs',t);
+	else vm.nameWord.doJs.xt(t);
+} end-code immediate
+code stop function(){
+	clearInterval(vm.timestamp);
+} end-code
+code inc function(){
+	var m=d3.select('#myTest1'), o=m.attr('transform').substr(t0.length);
+	var n=(parseFloat(o)+0.24)%360, t=t0+n.toFixed(2)+t1;
+	m.attr('transform',t);
+} end-code
+code go function(){
+	vm.timestamp=setInterval(vm.nameWord.inc.xt,20);
+	var g=d3.select('#myGraph1');
+	if(g)
+		setTimeout(function(){g.remove();},25);
+} end-code go</textarea><br><br>
 <svg>
-  <g id=myGraph>
-    <circle cx=70 cy=70 r=5></circle>
-    <text transform="rotate(30 5,40)" x=10 y=25>I love SVG</text>
-    <rect stroke="red" fill="none" x=10 y=10 height=130 width=120></rect>
-  </g>
-  <g transform="translate(100,30),rotate(45 60 60)">
-	<use xlink:href="#myGraph" />
-  </g>
 </svg>
 <script>
-var svg=vm.svg=document.getElementsByTagName('svg')[0]; // the svg area
-var g=vm.g=svg.children, g0=g[0], g1=g[1]; // 1st g, 2nd g
-var gc=vm.gc=g0.children, c=vm.c=gc[0], t=vm.t=gc[1], r=vm.r=gc[2]; // circle, text, rect
-var ms=0,time=setInterval(function(){var t;
-	ms=(ms+1)%360,t='translate(100,30),rotate('+ms+' 60 60)';
-	g1.setAttribute('transform',t);
-},10)
+var svg=vm.svg=d3.select('svg');
+/*svg.html('');
+svg.append('circle').attr('r',42).attr('cx',150).attr('cy',100)
+.attr('fill','rgba(255,255,0,.1)').attr('stroke','black').attr('stroke-width',.5);
+svg.append('circle').attr('r',54).attr('cx',150).attr('cy',100)
+.attr('fill','rgba(255,255,0,.1)').attr('stroke','black').attr('stroke-width',.5);
+svg.append('circle').attr('r',72.2).attr('cx',150).attr('cy',100)
+.attr('fill','rgba(255,255,0,.1)').attr('stroke','black').attr('stroke-width',.5);
+svg.append('circle').attr('r',112).attr('cx',150).attr('cy',100)
+.attr('fill','rgba(255,255,0,.1)').attr('stroke','black').attr('stroke-width',.5);
+svg.append('circle').attr('r',123).attr('cx',150).attr('cy',100)
+.attr('fill','rgba(255,255,0,.1)').attr('stroke','black').attr('stroke-width',.5);
+var g=svg.append('g').attr('id','myGraph');
+g.append('circle').attr('r',5).attr('cx',70).attr('cy',70);
+g.append('line').attr('x1',70).attr('y1',70).attr('x2',130).attr('y2',130).attr('style',"stroke:red;stroke-width:.5");
+g.append('line').attr('x1',70).attr('y1',70).attr('x2',10).attr('y2',130).attr('style',"stroke:red;stroke-width:.5");
+var t=g.append('text').attr('transform',"rotate(19,5,40)").attr('x',10).attr('y',25);
+t.append('tspan').attr('fill','blue' ).text(' 我');
+t.append('tspan').attr('fill','green').text(' 愛');
+t.append('tspan').attr('fill','brown').text(' 偕伊');
+t.append('tspan').attr('fill','red'  ).text(' 符式');
+t.append('tspan').attr('fill','blue' ).attr('x',52).attr('y',1).text(' I');
+t.append('tspan').attr('fill','green').attr('x',62).attr('y',1).text(' love');
+t.append('tspan').attr('fill','brown').attr('x',85).attr('y',1).text(' je');
+t.append('tspan').attr('fill','red'  ).attr('x',97).attr('y',1).text(' forth');
+g.append('rect').attr('stroke',"red").attr('fill',"rgba(255,100,100,.1)").attr('x','10').attr('y','10').attr('height','120').attr('width','120');
+g=svg.append('g').attr('id','myTest').attr('transform',t0+0+t1);
+g.append('use').attr('xlink:href',"#myGraph");
+vm.stop=function(){
+	clearInterval(vm.timestamp);
+}
+vm.inc=function(){
+	var m=d3.select('#myTest'), o=m.attr('transform').substr(t0.length);
+	var n=(parseFloat(o)+0.24)%360, t=t0+n.toFixed(2)+t1;
+	m.attr('transform',t);
+}
+vm.go=function(){
+	vm.timestamp=setInterval(vm.inc,20);
+}
+vm.go();
+setTimeout(function(){svg[0][0].removeChild(d3.select('#myGraph')[0][0])},25);
+*/
+var t0='translate(40,40),rotate(', t1=',110,60)';
+var body=d3.select('body')[0][0];
 vm.inp='inp', vm.tst='tst', vm.err='err', vm.ok='ok';
 vm.ids=["lenSys","lenExt","lenTst","jefLog","jefTst"];
 vm.ids.forEach(function(id){vm[id]=document.getElementById(id);})
 var t,n=0;
-t=fs.readFileSync("jefvm.v3.js","utf8");
-vm.lenSys.innerHTML=t.split('\n').length;
-vm.cr=function(msg){ var t=vm.tob+(msg||'');// get t=msg to print and clear tob
+t=fs.readFileSync("jefvm.v3.js","utf8"),n=t?t.split('\n').length:0;
+vm.lenSys.innerHTML=n;
+vm.cr=function(msg){ // get msg to print and clear tob
+	var t= vm.tob;
+	t+= msg===undefined ? '' : msg;
 	if (t!==" <ok> ok</ok>") vm.lastTob=t;
 	vm.tob='';
 	vm.jefLog.innerHTML+=t+'\n';	// print out
-	vm.jefLog.scrollTop=vm.jefLog.scrollHeight;
+	body.scrollTop=body.scrollHeight;
 }
-t=fs.readFileSync("jefvm.v3_ext.js","utf8");
-vm.lenExt.innerHTML=t.split('\n').length;
-vm.v3_tst=fs.readFileSync("jefvm.v3_tst.js","utf8");
-var lines=vm.v3_tst.split('\n');
-vm.lenTst.innerHTML=lines.length;
+t=fs.readFileSync("jefvm.v3_ext.js","utf8"),n=t?t.split('\n').length:0;
+vm.lenExt.innerHTML=n;
+vm.v3_tst=t=fs.readFileSync("jefvm.v3_tst.js","utf8"),n=0;
+if(t)var lines=vm.v3_tst.split('\n'),n=lines.length;
+vm.lenTst.innerHTML=n;
 function onClick(){
-	vm.exec(vm.jefTst.value);
+	if(vm.jefTst)vm.exec(vm.jefTst.value),vm.jefTst.value='';
 }
 function prevInp(){
 	if(vm.iCmd>0)
@@ -82,7 +162,7 @@ function clearJefTst(){
 <script src="jefvm.v3_tst.js"></script>
 <script>
 onClick();
-vm.jefTst.value='2 for del 1000 ms add 1000 ms next';
+vm.jefTst.value=': x\n  js Date() . "停  2 秒" . cr\n  stop 2000 ms 500\n  js Date() . "轉 10 秒" . cr\n  for inc 20 ms next\n  js Date() . "停"       . cr ; x';
 vm.fence=vm.cmds.length;
 function saveJefTst(){
 	var i=vm.v3_tst.lastIndexOf("vm.showTst('total tests '+tests+' passed '+passed);");
@@ -90,7 +170,8 @@ function saveJefTst(){
 	vm.v3_tst=vm.v3_tst.substr(0,i)+vm.cmds.slice(vm.fence).map(function(t){
 		return 'vm.exec('+JSON.stringify(t)+');'
 	}).join('\n')+'\n'+r;
+	localStorage.set('jefvm:cmds',vm.cmds);
 	fs.writeFileSync("jefvm.v3_tst.js",vm.v3_tst,"utf8");
 }
 </script>
-</html>
+</body></html>
